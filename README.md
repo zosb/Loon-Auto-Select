@@ -1,6 +1,6 @@
 # Loon Auto Select
 
-一个基于 **iKeLee / 可莉 Loon Auto** 配置模板定制的长期自动分流配置，面向 Loon 日常使用与 Crush Cloud 节点环境。
+一个基于 **iKeLee / 可莉 Loon Auto** 配置模板定制的长期自动分流配置，面向 Loon 日常使用与 VPN 节点环境。
 
 ## 主要特性
 

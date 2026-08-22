@@ -1,0 +1,28 @@
+# Private Loon / proxy credentials
+*.p12
+*.pfx
+*.pem
+*.key
+*.cer
+*.crt
+*.mobileconfig
+
+# Local/private configuration variants
+*.private.lcf
+*.local.lcf
+Loon_Auto_Select_Private.lcf
+secrets.*
+.env
+.env.*
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Temporary / backup files
+*.bak
+*.tmp
+*.swp
+*~

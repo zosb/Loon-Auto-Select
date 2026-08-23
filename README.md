@@ -18,10 +18,14 @@ Raw 配置地址：
 - 香港、澳门、台湾、日本、韩国、新加坡、美国、英国、德国节点自动筛选
 - **节点只按国家 / 地区归类**，不再按高倍率、实验、测试、游戏、YouTube、无广等标签拆分节点池
 - 国家 / 地区内部通过 `url-test` 自动选择较快节点
+- IPv6 优先：`ip-mode = ipv6-preferred`，并使用 `ipv6-vif = always`
 - AI 固定新加坡，并使用 `fallback` 尽量保持稳定出口 IP
 - TikTok 固定韩国，韩国内部自动优选
 - 国际流媒体固定美国，美国内部自动优选
-- YouTube 按地区策略自动容灾
+- Google / 社交 / 开发共用近邻自动测速池，已纳入韩国
+- YouTube 使用两层 `url-test`，地区内和地区间都自动测速
+- 游戏平台使用稳定型 `url-test`，以较高 `tolerance` 减少轻微延迟波动导致的切换
+- 开发服务覆盖 GitHub、GitLab、Notion、Docker、NPM、Vercel
 - HTTPDNS 防绕过与 DNS 防泄漏
 - 通用广告拦截 + 常用 App 专项去广告插件
 - 国家 / 地区图标使用 Qure，应用图标使用 IconResource
@@ -67,13 +71,21 @@ ChatGPT、Gemini、Claude、Copilot、Grok 等 AI 服务固定使用新加坡节
 
 Netflix、Disney+、Amazon Prime Video、Twitch、Apple TV+ 以及 `USMedia` 规则统一使用美国地区，美国节点池内部自动优选。
 
+### 近邻自动测速
+
+Google、社交媒体、开发服务共用香港、澳门、台湾、日本、韩国、新加坡组成的近邻策略池。每个地区先在本地区自动测速，再由上层 `url-test` 在地区之间选择更优策略。
+
 ### YouTube
 
-按澳门 → 香港 → 台湾 → 日本 → 新加坡 → 美国的地区顺序自动容灾；每个地区内部通过 `url-test` 自动优选节点。
+YouTube 使用两层自动测速：香港、澳门、台湾、日本、韩国、新加坡、美国各自先选择本地区较快节点，再由 `YouTube时延优选` 在这些地区策略之间自动选择较优结果，不再采用固定地区顺序的 `fallback`。
 
 ### 游戏
 
-Steam、Epic、PlayStation、Xbox 等游戏平台不再依赖“游戏节点”命名，按香港 → 日本 → 新加坡 → 美国的地区顺序自动容灾。
+Steam、Epic、PlayStation、Xbox 等游戏平台不依赖“游戏节点”命名，直接在香港、台湾、日本、韩国、新加坡、美国地区策略之间进行 `url-test`。游戏策略使用较高的 `tolerance = 80`，用于减少轻微延迟变化造成的频繁切换。
+
+### 开发服务
+
+开发服务统一走近邻自动测速，覆盖 GitHub、GitLab、Notion、Docker、NPM 与 Vercel。
 
 ## 上游与致谢
 

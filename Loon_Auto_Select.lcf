@@ -1,20 +1,21 @@
 # ============================================================
 # Loon Auto Select
+# 长期自动分流公开配置
 #
-# File: Loon_Auto_Select.lcf
-# Base: Loon_Auto_Select_Config_By_iKeLee.lcf
-# Original Author: https://t.me/iKeLee
-# Customized: 2026-08-23
-# License: CC BY-NC-SA 4.0
+# 基于：Loon_Auto_Select_Config_By_iKeLee.lcf
+# 原始作者：https://t.me/iKeLee
+# 整理日期：2026-08-23
+# 许可：CC BY-NC-SA 4.0
 #
-# Public release notice:
-# - No private proxy subscription URL / token is included.
-# - No MitM CA / password is included.
-# - Fill those values locally in Loon only.
+# 公开版原则：
+# - 不包含私人节点订阅 URL / Token
+# - 不包含 MitM CA / 证书密码
+# - 默认仅启用 IPv4，IPv6 由用户按需在 Loon 中手动开启
 # ============================================================
 
 [General]
 
+# ---------- IP / DNS ----------
 ip-mode = v4-only
 ipv6-vif = off
 dns-server = system
@@ -23,47 +24,59 @@ disable-stun = true
 dns-reject-mode = LoopbackIP
 domain-reject-mode = DNS
 udp-fallback-mode = REJECT
+
+# ---------- 本地访问 ----------
 wifi-access-http-port = 7222
 wifi-access-socks5-port = 7221
 allow-wifi-access = false
 interface-mode = auto
+
+# ---------- 连通性与测速 ----------
 test-timeout = 5
 disconnect-on-policy-change = false
 internet-test-url = http://connectivitycheck.platform.hicloud.com/generate_204
 proxy-test-url = http://www.gstatic.com/generate_204
+
+# ---------- 资源解析 / Geo 数据 ----------
 resource-parser = https://raw.githubusercontent.com/sub-store-org/Sub-Store/release/sub-store-parser.loon.min.js
 geoip-url = https://geodata.kelee.one/Country-Masaiki.mmdb
 ipasn-url = https://geodata.kelee.one/GeoLite2-ASN-P3TERX.mmdb
 
-# 默认仅启用 IPv4；同时预留 IPv6 本地与局域网绕过范围，手动开启 IPv6 后可直接生效。
-skip-proxy = 192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,localhost,*.local,::1/128,fc00::/7,fe80::/10,e.crashlynatics.com
+# ---------- 本地与局域网绕过 ----------
+# IPv6 默认关闭，但预留 IPv6 本地网段；用户手动开启 IPv6 后可直接生效。
+skip-proxy = 192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,localhost,*.local,::1/128,fc00::/7,fe80::/10,e.crashlytics.com
 bypass-tun = 10.0.0.0/8,100.64.0.0/10,127.0.0.0/8,169.254.0.0/16,172.16.0.0/12,192.0.0.0/24,192.0.2.0/24,192.88.99.0/24,192.168.0.0/16,198.51.100.0/24,203.0.113.0/24,224.0.0.0/4,255.255.255.255/32,::1/128,fc00::/7,fe80::/10,ff00::/8,localhost,*.local
 
 [Proxy]
 
 [Remote Proxy]
 
-# 在这里填入你自己的机场 / 代理订阅；公开版不保存私人订阅 URL 或 Token。
+# 在这里填入你自己的机场 / 代理订阅。
+# 公开仓库请勿保存私人订阅 URL、Token、用户名或密码。
 # 示例：
 # Subscription = https://YOUR_PRIVATE_SUBSCRIPTION_URL,...
 
 [Remote Filter]
 
-# 节点只按国家 / 地区归类。
-# 不再根据高倍率、实验、测试、游戏、YouTube、无广等标签拆分或排除节点。
-# 兼容常见中文 / 繁体 / 英文 / 国家代码 / 旗帜，以及 HK-01、HK_01、US-02 等命名方式。
+# ============================================================
+# 节点地区筛选
+#
+# 设计原则：只按国家 / 地区归类，不按倍率或节点用途拆分。
+# 2X、实验、测试、GAME、YouTube、无广等标签不会把节点排除出所属地区。
+# 兼容中文 / 繁体 / 英文 / 国家代码 / 旗帜，以及 HK-01、HK_01 等常见命名。
+# ============================================================
 
 香港节点 = NameRegex, FilterKey = "^(?=.*((?i)🇭🇰|香港|Hong[\s_-]*Kong|(\b(HKG|HK)(?:[\s_-]*\d+)?(?![A-Za-z])))).*$"
 澳门节点 = NameRegex, FilterKey = "^(?=.*((?i)🇲🇴|澳门|澳門|Macau|Macao|(\b(MAC|MO)(?:[\s_-]*\d+)?(?![A-Za-z])))).*$"
 台湾节点 = NameRegex, FilterKey = "^(?=.*((?i)🇹🇼|台湾|台灣|台北|Taipei|Taiwan|(\b(TWN|TW)(?:[\s_-]*\d+)?(?![A-Za-z])))).*$"
 日本节点 = NameRegex, FilterKey = "^(?=.*((?i)🇯🇵|日本|川日|东京|東京|大阪|泉日|埼玉|Tokyo|Osaka|Japan|(\b(JPN|JP)(?:[\s_-]*\d+)?(?![A-Za-z])))).*$"
 韩国节点 = NameRegex, FilterKey = "^(?=.*((?i)🇰🇷|韩国|韓國|韓|首尔|首爾|Seoul|Korea|South[\s_-]*Korea|(\b(KOR|KR)(?:[\s_-]*\d+)?(?![A-Za-z])))).*$"
-新国节点 = NameRegex, FilterKey = "^(?=.*((?i)🇸🇬|新加坡|狮|獅|狮城|獅城|Singapore|(\b(SGP|SG)(?:[\s_-]*\d+)?(?![A-Za-z])))).*$"
+新加坡节点 = NameRegex, FilterKey = "^(?=.*((?i)🇸🇬|新加坡|狮|獅|狮城|獅城|Singapore|(\b(SGP|SG)(?:[\s_-]*\d+)?(?![A-Za-z])))).*$"
 美国节点 = NameRegex, FilterKey = "^(?=.*((?i)🇺🇸|美国|美國|波特兰|波特蘭|达拉斯|達拉斯|俄勒冈|俄勒岡|凤凰城|鳳凰城|费利蒙|費利蒙|硅谷|矽谷|拉斯维加斯|拉斯維加斯|洛杉矶|洛杉磯|圣何塞|聖何塞|圣克拉拉|聖克拉拉|西雅图|西雅圖|芝加哥|United[\s_-]*States|(\b(USA|US)(?:[\s_-]*\d+)?(?![A-Za-z])))).*$"
 英国节点 = NameRegex, FilterKey = "^(?=.*((?i)🇬🇧|英国|英國|伦敦|倫敦|曼彻斯特|曼徹斯特|伯明翰|London|Manchester|Birmingham|Britain|England|United[\s_-]*Kingdom|(\b(GBR|GB|UK)(?:[\s_-]*\d+)?(?![A-Za-z])))).*$"
 德国节点 = NameRegex, FilterKey = "^(?=.*((?i)🇩🇪|德国|德國|法兰克福|法蘭克福|柏林|慕尼黑|Frankfurt|Berlin|Munich|Germany|(\b(DEU|GER|DE)(?:[\s_-]*\d+)?(?![A-Za-z])))).*$"
 
-# 全球节点仅过滤常见订阅信息项，不区分节点倍率或节点类型。
+# 全球节点仅过滤常见订阅信息项，不区分倍率、实验或用途标签。
 全球节点 = NameRegex, FilterKey = "^(?=.*(.))(?!.*((?i)群|邀请|邀請|返利|循环|循環|官网|官網|客服|网站|網站|网址|網址|获取|獲取|订阅|訂閱|流量|到期|机场|機場|下次|版本|官址|备用|備用|过期|過期|已用|联系|聯繫|邮箱|郵箱|工单|工單|贩卖|販賣|通知|倒卖|倒賣|防止|国内|國內|地址|频道|頻道|无法|無法|说明|說明|使用|提示|特别|特別|访问|訪問|支持|教程|关注|關注|更新|作者|加入|超时|超時|收藏|福利|好友|失联|失聯|(\b(USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic)(\d+)?\b|(\d{4}-\d{2}-\d{2}|\dG)))).*$"
 
 [Proxy Group]
@@ -77,7 +90,7 @@ bypass-tun = 10.0.0.0/8,100.64.0.0/10,127.0.0.0/8,169.254.0.0/16,172.16.0.0/12,1
 台湾手动策略 = select,台湾节点,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Taiwan.png
 日本手动策略 = select,日本节点,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Japan.png
 韩国手动策略 = select,韩国节点,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Korea.png
-新加坡手动策略 = select,新国节点,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Singapore.png
+新加坡手动策略 = select,新加坡节点,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Singapore.png
 美国手动策略 = select,美国节点,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/United_States.png
 英国手动策略 = select,英国节点,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/United_Kingdom.png
 德国手动策略 = select,德国节点,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Germany.png
@@ -85,7 +98,7 @@ bypass-tun = 10.0.0.0/8,100.64.0.0/10,127.0.0.0/8,169.254.0.0/16,172.16.0.0/12,1
 
 # ============================================================
 # 地区内部自动测速
-# 120 秒一轮，兼顾节点变化响应与后台请求 / 电量开销。
+# 地区内部每 120 秒重新评估；tolerance=50 减少轻微波动切换。
 # ============================================================
 
 香港时延优选 = url-test,香港节点,interval = 120,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Hong_Kong.png
@@ -93,52 +106,46 @@ bypass-tun = 10.0.0.0/8,100.64.0.0/10,127.0.0.0/8,169.254.0.0/16,172.16.0.0/12,1
 台湾时延优选 = url-test,台湾节点,interval = 120,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Taiwan.png
 日本时延优选 = url-test,日本节点,interval = 120,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Japan.png
 韩国时延优选 = url-test,韩国节点,interval = 120,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Korea.png
-新加坡时延优选 = url-test,新国节点,interval = 120,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Singapore.png
+新加坡时延优选 = url-test,新加坡节点,interval = 120,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Singapore.png
 美国时延优选 = url-test,美国节点,interval = 120,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/United_States.png
 英国时延优选 = url-test,英国节点,interval = 120,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/United_Kingdom.png
 德国时延优选 = url-test,德国节点,interval = 120,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Germany.png
 
 # ============================================================
-# 共享上层测速 / 故障转移
-# 上层 url-test 300 秒一轮；fallback 保持 60 秒快速故障检测。
+# 上层自动测速 / 故障转移
+# 上层 url-test 每 300 秒重新评估；fallback 每 60 秒检测可用性。
 # ============================================================
 
-# 近邻池：港澳台日韩新；正常优先低延迟地区。
 近邻时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,interval = 300,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png
-
-# 全球池：近邻地区 + 美英德。
 全球时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,美国时延优选,英国时延优选,德国时延优选,interval = 300,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Global.png
-
-# 近邻业务只有在整个近邻池不可用时，才自动扩大到全球池。
 近邻故障转移 = fallback,近邻时延优选,全球时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png
 
-# YouTube：地区内先测速，地区间再测速；常用地区全部不可用时才进入全球池。
+# YouTube：地区内测速 → 常用地区间测速 → 全球故障转移。
 YouTube时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,美国时延优选,interval = 300,tolerance = 50,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YouTube.png
 YouTube故障转移 = fallback,YouTube时延优选,全球时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YouTube.png
 
-# 游戏：加入澳门；使用更高 tolerance 减少轻微延迟波动造成的频繁切换。
+# 游戏：覆盖港澳台日韩新美，并提高 tolerance 以减少游戏过程中的频繁切换。
 游戏时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,美国时延优选,interval = 300,tolerance = 80,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png
 游戏故障转移 = fallback,游戏时延优选,全球时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png
 
 # ============================================================
-# AI
-# 固定新加坡国家，使用 fallback 尽量保持稳定出口 IP
+# AI 稳定出口
+# 固定新加坡国家，使用 fallback 尽量保持稳定出口节点。
 # ============================================================
 
-AI新加坡稳定 = fallback,新国节点,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Singapore.png
+AI新加坡稳定 = fallback,新加坡节点,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Singapore.png
 
 # ============================================================
 # 应用策略
-# 第一项始终是自动策略；后续手动策略仅用于需要时临时接管。
+# 第一项为默认自动策略；后续手动策略仅用于临时接管。
 # ============================================================
 
-# Telegram 自动容灾链扩展到韩国 / 英国 / 德国；默认仍保持香港优先。
 Telegram自动 = fallback,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,新加坡时延优选,韩国时延优选,美国时延优选,英国时延优选,德国时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Telegram.png
 Telegram = select,Telegram自动,香港手动策略,澳门手动策略,台湾手动策略,日本手动策略,新加坡手动策略,韩国手动策略,美国手动策略,英国手动策略,德国手动策略,全球手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Telegram.png
 
 YouTube = select,YouTube故障转移,香港手动策略,澳门手动策略,台湾手动策略,日本手动策略,韩国手动策略,新加坡手动策略,美国手动策略,英国手动策略,德国手动策略,全球手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YouTube.png
 
-# AI 保持固定新加坡；手动接管也只允许选择新加坡节点。
+# AI 默认固定新加坡；手动接管也仅允许选择新加坡节点。
 ChatGPT = select,AI新加坡稳定,新加坡手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/ChatGPT.png
 Gemini = select,AI新加坡稳定,新加坡手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/GoogleGemini.png
 Claude = select,AI新加坡稳定,新加坡手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Claude.png
@@ -146,23 +153,19 @@ Copilot = select,AI新加坡稳定,新加坡手动策略,img-url = https://raw.g
 Grok = select,AI新加坡稳定,新加坡手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Grok.png
 
 Google = select,近邻故障转移,香港手动策略,澳门手动策略,台湾手动策略,日本手动策略,韩国手动策略,新加坡手动策略,美国手动策略,英国手动策略,德国手动策略,全球手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Google.png
-
-# TikTok 保持韩国；手动接管也只在韩国节点池内选择。
 TikTok = select,韩国时延优选,韩国手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/TikTok.png
-
 社交媒体 = select,近邻故障转移,香港手动策略,澳门手动策略,台湾手动策略,日本手动策略,韩国手动策略,新加坡手动策略,美国手动策略,英国手动策略,德国手动策略,全球手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/X.png
 
-# 国际流媒体和 Spotify 仍固定美国；保留美国手动节点接管，不自动跨区改变媒体库。
+# 流媒体固定美国，避免自动跨区导致媒体库变化。
 国际流媒体 = select,美国时延优选,美国手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Netflix.png
 Spotify = select,美国时延优选,美国手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Spotify.png
 
 开发服务 = select,近邻故障转移,香港手动策略,澳门手动策略,台湾手动策略,日本手动策略,韩国手动策略,新加坡手动策略,美国手动策略,英国手动策略,德国手动策略,全球手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/GitHub.png
-
 游戏平台 = select,游戏故障转移,香港手动策略,澳门手动策略,台湾手动策略,日本手动策略,韩国手动策略,新加坡手动策略,美国手动策略,英国手动策略,德国手动策略,全球手动策略,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png
 
 # ============================================================
 # FINAL
-# 港 → 澳 → 台 → 日 → 新 → 韩 → 美 → 英 → 德
+# 默认后备顺序：港 → 澳 → 台 → 日 → 新 → 韩 → 美 → 英 → 德
 # ============================================================
 
 兜底后备策略 = fallback,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,新加坡时延优选,韩国时延优选,美国时延优选,英国时延优选,德国时延优选,interval = 60,max-timeout = 2000,img-url = https://github.com/shindgewongxj/WHATSINStash/raw/main/icon/fallback.png
@@ -178,10 +181,14 @@ FINAL,兜底后备策略
 
 [Remote Rule]
 
+# ============================================================
+# 远程规则顺序：越具体越靠前，中国大陆 REGION 保持最后。
+# ============================================================
+
 # LAN
 https://kelee.one/Tool/Loon/Lsr/LAN_SPLITTER.lsr, policy=DIRECT, tag=LAN, enabled=true
 
-# AI：专项规则优先，AI Catch-All 放在其后。
+# AI：专项规则优先，AI Catch-All 位于其后。
 https://rule.kelee.one/Loon/OpenAI.lsr, policy=ChatGPT, tag=ChatGPT, enabled=true
 https://rule.kelee.one/Loon/Gemini.lsr, policy=Gemini, tag=Gemini, enabled=true
 https://rule.kelee.one/Loon/Claude.lsr, policy=Claude, tag=Claude, enabled=true
@@ -192,10 +199,11 @@ https://kelee.one/Tool/Loon/Lsr/AI.lsr, policy=AI新加坡稳定, tag=AI-Other, 
 https://rule.kelee.one/Loon/YouTube.lsr, policy=YouTube, tag=YouTube, enabled=true
 https://rule.kelee.one/Loon/YouTubeMusic.lsr, policy=YouTube, tag=YouTube-Music, enabled=true
 
+# Telegram / TikTok
 https://rule.kelee.one/Loon/Telegram.lsr, policy=Telegram, tag=Telegram, enabled=true
 https://kelee.one/Tool/Loon/Lsr/TikTok.lsr, policy=TikTok, tag=TikTok, enabled=true
 
-# 社交
+# 社交媒体
 https://rule.kelee.one/Loon/Twitter.lsr, policy=社交媒体, tag=X-Twitter, enabled=true
 https://rule.kelee.one/Loon/Threads.lsr, policy=社交媒体, tag=Threads, enabled=true
 https://rule.kelee.one/Loon/Instagram.lsr, policy=社交媒体, tag=Instagram, enabled=true
@@ -222,19 +230,20 @@ https://rule.kelee.one/Loon/Docker.lsr, policy=开发服务, tag=Docker, enabled
 https://rule.kelee.one/Loon/Npmjs.lsr, policy=开发服务, tag=NPM, enabled=true
 https://rule.kelee.one/Loon/Vercel.lsr, policy=开发服务, tag=Vercel, enabled=true
 
-# 游戏
+# 游戏：SteamCN 直连必须位于 Steam 大规则之前。
 https://rule.kelee.one/Loon/SteamCN.lsr, policy=DIRECT, tag=Steam-CN, enabled=true
 https://rule.kelee.one/Loon/Steam.lsr, policy=游戏平台, tag=Steam, enabled=true
 https://rule.kelee.one/Loon/Epic.lsr, policy=游戏平台, tag=Epic, enabled=true
 https://rule.kelee.one/Loon/PlayStation.lsr, policy=游戏平台, tag=PlayStation, enabled=true
 https://rule.kelee.one/Loon/Xbox.lsr, policy=游戏平台, tag=Xbox, enabled=true
 
-# Google 必须放在 Gemini / AI / YouTube 之后。
+# Google 必须位于 Gemini / AI / YouTube 之后。
 https://rule.kelee.one/Loon/Google.lsr, policy=Google, tag=Google, enabled=true
 
+# Speedtest
 https://kelee.one/Tool/Loon/Lsr/SpeedtestInternational.lsr, policy=全球时延优选, tag=Speedtest-Intl, enabled=true
 
-# 中国大陆 REGION 必须保持最后。
+# 中国大陆 REGION 保持远程规则最后。
 https://kelee.one/Tool/Loon/Lsr/REGION_SPLITTER.lsr, policy=DIRECT, tag=CN-REGION, enabled=true
 
 [Host]
@@ -245,59 +254,48 @@ https://kelee.one/Tool/Loon/Lsr/REGION_SPLITTER.lsr, policy=DIRECT, tag=CN-REGIO
 
 [Plugin]
 
-# 基础广告 / HTTPDNS。
+# ============================================================
+# 基础网络 / 广告层
+# BlockAdvertisers 是专项去广告插件的基础，保持在插件列表顶部。
+# ============================================================
+
 https://kelee.one/Tool/Loon/Lpx/BlockAdvertisers.lpx, pin=true, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Block_HTTPDNS.lpx, pin=true, enabled=true
 
-# 仅处理特定节点域名 *.node.daacc.org；不会限制其它机场 / 订阅节点使用。
+# 特定节点域名 DNS；仅匹配 *.node.daacc.org，不接管全局 DNS。
 https://raw.githubusercontent.com/crushcloud91/Crush-Cloud/main/crushcloud-dns.plugin, img-url=externaldrive.badge.icloud, enabled=true
 
-# 常用 App 专项去广告。
-https://kelee.one/Tool/Loon/Lpx/Weixin_Official_Accounts_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/WexinMiniPrograms_Remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/Weibo_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/RedPaper_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/Bilibili_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/Zhihu_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/Taobao_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/JD_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/PinDuoDuo_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/FleaMarket_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/Cainiao_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/Amap_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/DiDi_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/12306_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/BaiduNetDisk_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/AliYunDrive_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/QuarkBrowser_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/Tencent_Video_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/iQiYi_Video_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/YouKu_Video_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/KuaiShou_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/Himalaya_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/NeteaseCloudMusic_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/QQMusic_remove_ads.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/Reddit_remove_ads.lpx, enabled=true
+# ============================================================
+# 国外常用 App 专项去广告
+#
+# 仅保留常用且有明确专项插件的服务，避免为大量国内 App 增加 Rewrite / Script 面积。
+# 专项插件可能需要 MitM；App 更新后也可能需要更新插件。
+# ============================================================
+
+https://kelee.one/Tool/Loon/Lpx/YouTube_remove_ads.lpx, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Spotify_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Reddit_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Pinterest_remove_ads.lpx, enabled=true
+https://kelee.one/Tool/Loon/Lpx/Line_remove_ads.lpx, enabled=true
 
-# 宽泛 Rewrite 默认关闭，避免与专项插件重复。
-https://kelee.one/Tool/Loon/Lpx/Remove_ads_by_keli.lpx, enabled=false
+# Spotify 插件仅用于广告处理，不等同于 Premium 解锁。
 
-# YouTube Rewrite 默认关闭；如需要网络层去广告可自行开启测试。
-https://kelee.one/Tool/Loon/Lpx/YouTube_remove_ads.lpx, enabled=false
+# ============================================================
+# 工具插件
+# ============================================================
 
-# 工具插件。
 https://kelee.one/Tool/Loon/Lpx/QuickSearch.lpx, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Prevent_DNS_Leaks.lpx, policy=兜底后备策略, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Node_detection_tool.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/TestFlightRegionUnlock.lpx, policy=DIRECT, enabled=false
 https://kelee.one/Tool/Loon/Lpx/BoxJs.lpx, policy=兜底后备策略, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Sub-Store.lpx, policy=兜底后备策略, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Script-Hub.lpx, policy=兜底后备策略, enabled=true
 
 [Mitm]
 
-# 需要 HTTPS Rewrite 时，请在 Loon 本地生成并信任自己的 CA；公开仓库不保存证书材料。
+# 公开仓库不保存证书材料。
+# YouTube / Spotify / Reddit / Pinterest / LINE 等专项插件若依赖 HTTPS Rewrite，
+# 请在 Loon 本地生成、安装并信任自己的 CA。
 hostname =
 ca-p12 =
 ca-passphrase =

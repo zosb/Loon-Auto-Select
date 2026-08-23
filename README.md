@@ -54,8 +54,8 @@ https://raw.githubusercontent.com/zosb/Loon-Auto-Select/main/Loon_Auto_Select.lc
 - 自动识别香港、澳门、台湾、日本、韩国、新加坡、美国、英国、德国节点
 - 节点只按照国家 / 地区归类，不按倍率、实验性质或用途拆池
 - 每个地区内部通过 `url-test` 自动选择较合适的节点
-- Google、社交媒体、开发服务优先亚洲近邻地区，近邻全部异常时再进入全球故障转移
-- YouTube 使用“地区内测速 → 地区间测速 → 全球故障转移”三级结构
+- Google、社交媒体、开发服务优先亚洲近邻地区，近邻全部异常时再扩大到主要地区池
+- YouTube 使用“地区内测速 → 地区间测速 → 主要地区故障转移”三级结构
 - AI 服务固定新加坡，使用 `fallback` 尽量保持稳定出口
 - TikTok 固定韩国
 - 国际流媒体与 Spotify 固定美国
@@ -63,6 +63,7 @@ https://raw.githubusercontent.com/zosb/Loon-Auto-Select/main/Loon_Auto_Select.lc
 - 游戏平台根据延迟在港澳台日韩新美之间自动选择，并使用更高容差减少频繁切换
 - 主要应用保留手动地区 / 节点接管入口
 - 集成广告平台拦截、HTTPDNS 防绕过、DNS 防泄漏和少量国外常用 App 专项去广告
+- 默认不绑定任何机场专属 DNS / Host 插件
 
 整体原则是：
 
@@ -123,7 +124,7 @@ USA-02
 | 类型 | 周期 | 作用 |
 | --- | ---: | --- |
 | 地区内部 `url-test` | 120 秒 | 在同一地区节点之间重新评估 |
-| 近邻 / 全球 / YouTube / 游戏上层 `url-test` | 300 秒 | 在多个地区策略之间重新评估 |
+| 近邻 / 主要地区 / YouTube / 游戏上层 `url-test` | 300 秒 | 在多个地区策略之间重新评估 |
 | `fallback` | 60 秒 | 检测可用性并及时切换后备策略 |
 
 普通测速使用：
@@ -142,6 +143,23 @@ tolerance = 80
 
 更高的 `tolerance` 用于减少几十毫秒的小幅波动造成的频繁切换。
 
+### 近邻、主要地区与全球节点的区别
+
+为了避免把机场里所有地区的节点都加入后台自动测速，配置把“自动测速范围”和“全部节点手动入口”分开：
+
+```text
+近邻时延优选
+= 香港 / 澳门 / 台湾 / 日本 / 韩国 / 新加坡
+
+主要地区时延优选
+= 香港 / 澳门 / 台湾 / 日本 / 韩国 / 新加坡 / 美国 / 英国 / 德国
+
+全球手动策略
+= 全球节点中所有正常节点
+```
+
+因此 `主要地区时延优选` 并不代表机场的全部全球节点。加拿大、法国、荷兰、澳大利亚等其它地区如果存在，仍可通过 **全球手动策略** 使用，但不会默认加入周期性自动测速，从而控制后台请求和电量开销。
+
 ---
 
 ## 主要分流策略
@@ -151,12 +169,12 @@ tolerance = 80
 | ChatGPT / Gemini / Claude / Copilot / Grok | 新加坡稳定出口 |
 | TikTok | 韩国 |
 | Telegram | 香港优先，按地区顺序自动容灾 |
-| YouTube / YouTube Music | 港澳台日韩新美自动测速，异常时全球容灾 |
-| Google | 亚洲近邻自动测速，异常时全球容灾 |
-| X / Threads / Instagram / Facebook / WhatsApp / Reddit / Discord / LINE | 亚洲近邻自动测速，异常时全球容灾 |
+| YouTube / YouTube Music | 港澳台日韩新美自动测速，异常时进入主要地区池 |
+| Google | 亚洲近邻自动测速，异常时进入主要地区池 |
+| X / Threads / Instagram / Facebook / WhatsApp / Reddit / Discord / LINE / Pinterest | 亚洲近邻自动测速，异常时进入主要地区池 |
 | Netflix / Disney+ / Prime Video / Twitch / Apple TV+ | 美国 |
 | Spotify | 美国 |
-| GitHub / GitLab / Notion / Docker / NPM / Vercel | 亚洲近邻自动测速，异常时全球容灾 |
+| GitHub / GitLab / Notion / Docker / NPM / Vercel | 亚洲近邻自动测速，异常时进入主要地区池 |
 | Steam / Epic / PlayStation / Xbox | 港澳台日韩新美稳定型自动测速 |
 | 其它未匹配流量 | `兜底后备策略` |
 
@@ -199,7 +217,7 @@ YouTube 使用三级结构：
 ```text
 地区内部自动测速
 → 港澳台日韩新美之间自动测速
-→ 常用地区全部异常时进入全球故障转移
+→ 常用地区全部异常时进入主要地区时延优选
 ```
 
 YouTube 不是固定国家策略，而是优先选择当前更合适的常用地区。
@@ -212,9 +230,11 @@ YouTube 不是固定国家策略，而是优先选择当前更合适的常用地
 香港 / 澳门 / 台湾 / 日本 / 韩国 / 新加坡
 ```
 
-近邻池全部不可用时，才扩大到全球池中的美国、英国、德国等地区。
+近邻池全部不可用时，才扩大到 **主要地区时延优选**，加入美国、英国、德国继续寻找可用线路。
 
 这样可以避免正常情况下因为欧美节点偶尔快几毫秒就主动跨洲。
+
+Pinterest 已纳入 `社交媒体` 远程分流规则，因此它与 X、Instagram、Reddit、LINE 等服务使用同一套近邻优先与故障转移逻辑。
 
 ### 国际流媒体与 Spotify
 
@@ -234,7 +254,7 @@ Steam、Epic、PlayStation、Xbox 不要求节点名称带有“游戏”标签�
 香港 / 澳门 / 台湾 / 日本 / 韩国 / 新加坡 / 美国
 ```
 
-常用游戏地区全部不可用时，再进入全球故障转移。
+常用游戏地区全部不可用时，再进入 **主要地区时延优选** 进行故障转移。
 
 ---
 
@@ -419,14 +439,6 @@ Script-Hub
 
 它们与去广告职责分开，主要用于搜索、DNS 防泄漏、节点检测和资源管理。
 
-配置中还保留一个特定节点域名 DNS 插件，只处理：
-
-```text
-*.node.daacc.org
-```
-
-它不会接管全局 DNS，也不会限制其它机场节点使用。
-
 ---
 
 ## DNS
@@ -440,6 +452,8 @@ dns-server = system
 没有强制添加额外 DoH / DoQ，以减少运营商、CDN、IPv4 / IPv6 以及不同网络环境之间的兼容性变量。
 
 同时启用 `Block_HTTPDNS` 与 `Prevent_DNS_Leaks` 作为辅助保护。
+
+为了保持公开配置的机场无关性，默认版**不再内置任何特定机场的 DNS / Host 插件**。如果你的机场明确要求使用专用 DNS、Host 或解析插件，请按照机场自己的说明在 Loon 中单独添加。
 
 ---
 
@@ -468,6 +482,7 @@ LAN
 - Gemini / AI 规则位于 Google 大规则之前
 - YouTube 位于 Google 大规则之前
 - SteamCN 位于 Steam 大规则之前
+- Pinterest 与其它社交媒体规则位于同一层级
 - `REGION_SPLITTER` 保持远程规则最后
 
 ---
@@ -502,6 +517,12 @@ LAN
 默认版只预装 YouTube、Spotify、Reddit、Pinterest、LINE 等少量常用专项插件。
 
 其它 App 请前往 **https://hub.kelee.one** 按需选择插件并自行添加，不建议把所有插件一次性启用。
+
+### 我的机场要求专用 DNS / Host 插件
+
+公开默认版不会绑定任何机场专属 DNS / Host 插件。
+
+如果你的机场节点需要额外解析规则，请按照机场提供的说明自行添加；这样不会把某一家服务商的专属配置强加给其它使用者。
 
 ### IPv6 节点无法连接
 

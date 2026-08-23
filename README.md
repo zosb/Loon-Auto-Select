@@ -62,7 +62,7 @@ https://raw.githubusercontent.com/zosb/Loon-Auto-Select/main/Loon_Auto_Select.lc
 - Telegram 默认香港优先，并按照后备顺序自动容灾
 - 游戏平台根据延迟在港澳台日韩新美之间自动选择，并使用更高容差减少频繁切换
 - 主要应用保留手动地区 / 节点接管入口
-- 集成广告平台拦截、HTTPDNS 防绕过、DNS 防泄漏和少量国外常用 App 专项去广告
+- 集成广告平台基础拦截、HTTPDNS 防绕过和少量国外常用 App 专项去广告
 - 默认不绑定任何机场专属 DNS / Host 插件
 
 整体原则是：
@@ -112,6 +112,8 @@ United States
 United_States
 USA-02
 ```
+
+`全球节点` 只过滤明显的订阅信息 / 公告项，例如流量、到期、订阅、官网、客服、邮箱、套餐、重置时间等；不会再因为“备用、支持、特别、访问、使用”等泛化词把真实节点排除掉。
 
 如果某一家机场采用非常特殊的节点名称，只需要调整 `[Remote Filter]` 中相应地区的 `NameRegex`，不需要修改整套策略架构。
 
@@ -342,9 +344,24 @@ ff00::/8
 
 ```text
 广告平台基础拦截
++ HTTPDNS 防绕过
 + 少量国外常用 App 专项去广告
 + 必要工具插件
 ```
+
+### 运行要求
+
+建议使用 **Loon 3.4.0 (962) 或更高版本**，并尽量保持 Loon、规则和插件资源为最新版本。当前部分默认插件已经以 Loon 3.4.0 (962) 作为最低版本声明。
+
+专项去广告通常依赖 `Rewrite / Script / MitM`，因此需要注意：
+
+- 在自己的 Loon 中生成、安装并信任个人 MitM CA
+- 需要 HTTPS Rewrite 的插件必须允许相应域名进入 MitM
+- YouTube 专项插件需要启用 **MitM over HTTP/2** 与 **QUIC 回退保护**
+- 客户端或接口升级后，专项插件可能需要同步更新
+- 插件异常时优先单独停用该 App 插件排查，不要直接修改整套分流策略
+
+公开仓库不会保存任何 CA、证书密码或其它个人证书材料。
 
 ### 基础层
 
@@ -354,6 +371,10 @@ Block_HTTPDNS
 ```
 
 `BlockAdvertisers` 放在插件列表顶部，作为专项去广告插件的基础广告平台拦截层。
+
+`Block_HTTPDNS` 用于拦截常见 App 自带的 HTTPDNS / 私有解析请求，使相关请求重新回到 Loon 的 DNS 框架。它和“把 DNS 检测网站强制走代理”不是一回事。
+
+默认配置不再预装名称容易产生误解的 `Prevent_DNS_Leaks` 插件。DNS 是否泄漏应根据实际 DNS 配置、请求路径和检测结果判断，而不是仅凭插件名称判断。
 
 ### 默认专项去广告 App
 
@@ -395,7 +416,7 @@ Line_remove_ads.lpx
 
 YouTube 专项去广告已默认开启。
 
-网络层去广告会受到 YouTube 客户端和接口更新影响，不能保证任何版本永久有效。如果 YouTube 更新后出现广告恢复、播放异常或插件失效，优先更新插件；仍有问题时再临时关闭该插件排查。
+该插件除 MitM 外，还要求 **MitM over HTTP/2** 与 **QUIC 回退保护**。网络层去广告会受到 YouTube 客户端和接口更新影响，不能保证任何版本永久有效。如果 YouTube 更新后出现广告恢复、播放异常或插件失效，优先更新插件；仍有问题时再临时关闭该插件排查。
 
 ### Spotify
 
@@ -404,6 +425,8 @@ Spotify 专项插件用于处理播放广告和部分界面广告内容。
 > **去广告不等于 Premium 解锁。**
 
 本配置不会把免费账号变成 Spotify Premium，也不承诺 Premium 专属功能。
+
+如果修改 Spotify 插件自己的自定义选项，部分设置需要 **重新登录 Spotify** 后才会生效。
 
 ### MitM
 
@@ -430,14 +453,13 @@ skip-server-cert-verify = false
 
 ```text
 QuickSearch
-Prevent_DNS_Leaks
 Node_detection_tool
 BoxJs
 Sub-Store
 Script-Hub
 ```
 
-它们与去广告职责分开，主要用于搜索、DNS 防泄漏、节点检测和资源管理。
+它们与去广告职责分开，主要用于搜索、节点检测和资源管理。
 
 ---
 
@@ -451,9 +473,33 @@ dns-server = system
 
 没有强制添加额外 DoH / DoQ，以减少运营商、CDN、IPv4 / IPv6 以及不同网络环境之间的兼容性变量。
 
-同时启用 `Block_HTTPDNS` 与 `Prevent_DNS_Leaks` 作为辅助保护。
+默认启用 `Block_HTTPDNS`，用于降低部分 App 通过自带 HTTPDNS 绕开 Loon DNS 框架的情况。
 
-为了保持公开配置的机场无关性，默认版**不再内置任何特定机场的 DNS / Host 插件**。如果你的机场明确要求使用专用 DNS、Host 或解析插件，请按照机场自己的说明在 Loon 中单独添加。
+为了保持公开配置的机场无关性，默认版**不内置任何特定机场的 DNS / Host 插件**。如果你的机场明确要求使用专用 DNS、Host 或解析插件，请按照机场自己的说明在 Loon 中单独添加。
+
+---
+
+## UDP / STUN
+
+默认配置使用：
+
+```ini
+disable-stun = true
+udp-fallback-mode = REJECT
+```
+
+设计思路是减少 WebRTC / STUN 暴露本地网络信息，并且当代理节点不支持 UDP 时直接拒绝，而不是静默回落到 `DIRECT`。
+
+如果 Telegram、WhatsApp、Discord 语音 / 视频通话，或者某些游戏出现 UDP 相关异常，建议按下面顺序排查：
+
+```text
+先确认当前代理节点本身支持 UDP
+→ 更换同地区其它节点测试
+→ 检查 App 是否依赖 STUN / WebRTC
+→ 仅在本地临时测试 disable-stun = false
+```
+
+如果临时关闭 STUN 后恢复正常，说明问题更可能与该业务的 STUN / WebRTC 依赖有关；不建议因为单个 App 的问题直接改掉公开默认版的安全取向。
 
 ---
 
@@ -508,7 +554,9 @@ LAN
 
 ### 某个 App 开启去广告后异常
 
-先关闭对应 App 专项插件测试。
+先关闭对应 App 专项插件测试，并确认 Loon 与插件均已更新。
+
+如果是 YouTube，还要确认本地已经启用 **MitM over HTTP/2** 与 **QUIC 回退保护**。
 
 专项插件比基础分流规则更容易受客户端版本变化影响，所以不建议为了一个 App 的 Rewrite 问题去修改整个策略架构。
 
@@ -523,6 +571,10 @@ LAN
 公开默认版不会绑定任何机场专属 DNS / Host 插件。
 
 如果你的机场节点需要额外解析规则，请按照机场提供的说明自行添加；这样不会把某一家服务商的专属配置强加给其它使用者。
+
+### 语音通话或游戏 UDP 异常
+
+先确认节点是否支持 UDP，再更换节点排查。只有确认业务依赖 STUN / WebRTC 时，才建议在本地临时测试 `disable-stun = false`，不要直接修改公开默认配置。
 
 ### IPv6 节点无法连接
 
@@ -547,6 +599,10 @@ ca-passphrase
 ```
 
 `Loon_Auto_Select.lcf` 中的 `[Remote Proxy]` 和 `[Mitm]` 会始终保持为公开安全模板。
+
+仓库的 `.gitignore` 默认忽略 **所有其它 `.lcf` 文件**，只对白名单 `Loon_Auto_Select.lcf` 放行。这样即使你在本地另外保存了带私人订阅的 Loon 配置，也更不容易被误提交到公开仓库。
+
+如果未来需要新增另一个公开 `.lcf` 文件，应明确在 `.gitignore` 中增加对应白名单，而不是取消这层保护。
 
 ---
 

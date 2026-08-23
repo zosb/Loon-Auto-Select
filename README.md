@@ -40,6 +40,7 @@ https://raw.githubusercontent.com/zosb/Loon-Auto-Select/main/Loon_Auto_Select.lc
 | 文件 | 作用 |
 | --- | --- |
 | `Loon_Auto_Select.lcf` | Loon 主配置文件 |
+| `Plugin/Prevent_DNS_Leaks.lpx` | 本项目维护的 DNS / IP / IPv6 / WebRTC 泄漏检测辅助插件 |
 | `README.md` | 使用说明、策略逻辑和注意事项 |
 | `LICENSE` | 本项目及上游模板的许可说明 |
 | `.gitignore` | 防止证书、私人配置和临时文件被误提交 |
@@ -62,7 +63,7 @@ https://raw.githubusercontent.com/zosb/Loon-Auto-Select/main/Loon_Auto_Select.lc
 - Telegram 默认香港优先，并按照后备顺序自动容灾
 - 游戏平台根据延迟在港澳台日韩新美之间自动选择，并使用更高容差减少频繁切换
 - 主要应用保留手动地区 / 节点接管入口
-- 集成广告平台基础拦截、HTTPDNS 防绕过和少量国外常用 App 专项去广告
+- 集成广告平台基础拦截、HTTPDNS 防绕过、DNS / IP / IPv6 / WebRTC 泄漏检测辅助和少量国外常用 App 专项去广告
 - 默认不绑定任何机场专属 DNS / Host 插件
 
 整体原则是：
@@ -345,6 +346,7 @@ ff00::/8
 ```text
 广告平台基础拦截
 + HTTPDNS 防绕过
++ DNS / IP / IPv6 / WebRTC 泄漏检测辅助
 + 少量国外常用 App 专项去广告
 + 必要工具插件
 ```
@@ -368,13 +370,67 @@ ff00::/8
 ```text
 BlockAdvertisers
 Block_HTTPDNS
+Prevent_DNS_Leaks Enhanced
 ```
 
 `BlockAdvertisers` 放在插件列表顶部，作为专项去广告插件的基础广告平台拦截层。
 
-`Block_HTTPDNS` 用于拦截常见 App 自带的 HTTPDNS / 私有解析请求，使相关请求重新回到 Loon 的 DNS 框架。它和“把 DNS 检测网站强制走代理”不是一回事。
+`Block_HTTPDNS` 用于拦截常见 App 自带的 HTTPDNS / 私有解析请求，使相关请求重新回到 Loon 的 DNS 框架。
 
-默认配置不再预装名称容易产生误解的 `Prevent_DNS_Leaks` 插件。DNS 是否泄漏应根据实际 DNS 配置、请求路径和检测结果判断，而不是仅凭插件名称判断。
+### Prevent_DNS_Leaks Enhanced
+
+本项目保留了 `Prevent_DNS_Leaks` 的核心思路，但没有继续直接引用上游原版，而是在仓库中维护一个重新整理、去重并扩展后的版本：
+
+```text
+Plugin/Prevent_DNS_Leaks.lpx
+```
+
+主配置通过以下地址加载：
+
+```text
+https://raw.githubusercontent.com/zosb/Loon-Auto-Select/main/Plugin/Prevent_DNS_Leaks.lpx
+```
+
+它的准确定位是：
+
+> **DNS / IP / IPv6 / WebRTC 泄漏检测辅助与检测站路由保护。**
+
+它会把常见检测网站统一交给主配置指定的代理策略处理，当前主配置映射到 `兜底后备策略`。覆盖方向包括：
+
+```text
+DNS Resolver / DNS Leak 检测
+公网 IP / ASN / ISP / 出口环境检测
+IPv4 / IPv6 暴露检测
+WebRTC / 浏览器网络隐私检测
+```
+
+其中包括 `dnsleaktest.com`、`ipleak.net`、`browserleaks.com`、`whoer.net`、`pixelscan.net`、`ping0.cc`、`test-ipv6.com`、`ipv6-test.com` 等常见检测站。
+
+它**有实际作用**，但必须明确它不等于“安装后绝对不会 DNS 泄漏”。它不会：
+
+```text
+修改 dns-server
+强制开启 DoH / DoQ / DoH3
+劫持系统全部 DNS
+替代 Loon 的 TUN / DNS 设置
+替代 Block_HTTPDNS
+替代 disable-stun 对 STUN / WebRTC 的控制
+```
+
+因此正确理解应该是：
+
+```text
+Block_HTTPDNS
+→ 防止部分 App 通过自带 HTTPDNS 绕开 Loon DNS
+
+Prevent_DNS_Leaks Enhanced
+→ 让 DNS / IP / IPv6 / WebRTC 检测站使用指定代理出口，并辅助检查当前环境
+
+Loon 主配置 / 系统网络 / 代理节点
+→ 决定真正的 DNS、TUN、IPv6、UDP、STUN 请求路径
+```
+
+如果检测网站显示 ISP DNS、本地公网 IP 或异常 IPv6 出口，应继续检查实际 DNS / TUN / IPv6 / 节点配置，而不是认为插件会自动修复这些问题。
 
 ### 默认专项去广告 App
 
@@ -459,7 +515,7 @@ Sub-Store
 Script-Hub
 ```
 
-它们与去广告职责分开，主要用于搜索、节点检测和资源管理。
+它们与去广告和泄漏检测辅助职责分开，主要用于搜索、节点检测和资源管理。
 
 ---
 
@@ -473,7 +529,17 @@ dns-server = system
 
 没有强制添加额外 DoH / DoQ，以减少运营商、CDN、IPv4 / IPv6 以及不同网络环境之间的兼容性变量。
 
-默认启用 `Block_HTTPDNS`，用于降低部分 App 通过自带 HTTPDNS 绕开 Loon DNS 框架的情况。
+默认同时启用：
+
+```text
+Block_HTTPDNS
+Prevent_DNS_Leaks Enhanced
+```
+
+但两者职责完全不同：
+
+- `Block_HTTPDNS`：降低部分 App 通过自带 HTTPDNS 绕开 Loon DNS 框架的情况。
+- `Prevent_DNS_Leaks Enhanced`：让常见 DNS / IP / IPv6 / WebRTC 检测站通过指定代理策略访问，便于检查当前出口和解析环境；它本身不会重新配置 DNS。
 
 为了保持公开配置的机场无关性，默认版**不内置任何特定机场的 DNS / Host 插件**。如果你的机场明确要求使用专用 DNS、Host 或解析插件，请按照机场自己的说明在 Loon 中单独添加。
 
@@ -489,6 +555,8 @@ udp-fallback-mode = REJECT
 ```
 
 设计思路是减少 WebRTC / STUN 暴露本地网络信息，并且当代理节点不支持 UDP 时直接拒绝，而不是静默回落到 `DIRECT`。
+
+`Prevent_DNS_Leaks Enhanced` 可以让 WebRTC / 浏览器隐私检测网站本身走代理，但它不会替代这里的 STUN 控制。真正的 WebRTC/STUN 行为仍由 Loon 主配置、App 和系统网络共同决定。
 
 如果 Telegram、WhatsApp、Discord 语音 / 视频通话，或者某些游戏出现 UDP 相关异常，建议按下面顺序排查：
 
@@ -551,6 +619,22 @@ LAN
 先开启 Loon
 → 再更新全部订阅资源
 ```
+
+### DNS / IP 检测站显示异常怎么办？
+
+`Prevent_DNS_Leaks Enhanced` 只负责让检测站本身使用指定代理策略，并不会自动修复真实的 DNS / IPv6 / WebRTC 泄漏。
+
+如果检测结果出现本地 ISP DNS、本地公网 IP、意外 IPv6 出口或异常 WebRTC 地址，应该继续检查：
+
+```text
+当前策略实际选中了哪个节点
+→ dns-server 与系统 DNS 环境
+→ IPv6 是否按预期开启 / 关闭
+→ 节点是否正确承载 IPv4 / IPv6 / UDP
+→ disable-stun 与业务的 WebRTC / STUN 需求
+```
+
+建议至少使用两个不同的检测站交叉确认，不要仅凭单一网页的一个结果判断。
 
 ### 某个 App 开启去广告后异常
 
@@ -615,6 +699,7 @@ ca-passphrase
 - IconResource: https://github.com/luestr/IconResource
 - Qure Icons: https://github.com/Koolson/Qure
 - 可莉插件中心: https://hub.kelee.one
+- `Prevent_DNS_Leaks` 上游思路参考: https://kelee.one/Tool/Loon/Lpx/Prevent_DNS_Leaks.lpx
 
 原始模板作者：**iKeLee** — https://t.me/iKeLee
 

@@ -1,0 +1,70 @@
+#!name=DNS / IP 泄漏检测辅助
+#!desc=将常见 DNS、IP、IPv6、WebRTC 泄漏检测站统一交给指定代理策略处理，避免检测页面本身直连；不修改 DNS 服务器，也不替代 Loon 的 DNS、TUN、HTTPDNS 或 STUN 配置。
+#!openUrl=
+#!author=Loon Auto Select
+#!tag=DNS, Privacy, Network
+#!system=iOS, iPadOS, macOS
+#!system_version=
+#!loon_version=3.4.0(962)
+#!homepage=https://github.com/zosb/Loon-Auto-Select
+#!icon=https://raw.githubusercontent.com/luestr/IconResource/main/Other_icon/120px/Prevent_DNS_Leaks.png
+#!date=2026-08-23 18:21:00
+
+# ============================================================
+# Prevent_DNS_Leaks Enhanced
+#
+# 定位：泄漏检测辅助 / 检测站路由保护。
+#
+# 作用：
+# - 将常见 DNS / IP / IPv6 / WebRTC 检测站交给 PROXY。
+# - 避免检测页面本身因 DIRECT 导致结果与当前代理出口不一致。
+# - 方便检查代理出口、DNS Resolver、IPv6 与 WebRTC/STUN 暴露情况。
+#
+# 不做：
+# - 不修改 dns-server。
+# - 不强制 DoH / DoQ / DoH3。
+# - 不劫持系统 DNS。
+# - 不拦截 App 自带 HTTPDNS；该职责由 Block_HTTPDNS 负责。
+# - 不保证“安装后绝对无 DNS 泄漏”。真正的 DNS 路径仍由 Loon、系统网络和代理节点共同决定。
+#
+# 使用：在主配置引用本插件时通过 policy= 指定代理策略；
+# 插件中的 PROXY 将使用该策略。
+#
+# 设计参考了可莉插件库中的 Prevent_DNS_Leaks 思路，并针对本项目重新整理、去重和扩展。
+# 上游参考：https://kelee.one/Tool/Loon/Lpx/Prevent_DNS_Leaks.lpx
+# ============================================================
+
+[Rule]
+
+# ---------- DNS 泄漏检测 ----------
+DOMAIN-SUFFIX, dnsleaktest.com, PROXY
+DOMAIN-SUFFIX, dnsleak.com, PROXY
+DOMAIN-SUFFIX, dnsleak.asn247.net, PROXY
+DOMAIN-SUFFIX, browserleaks.com, PROXY
+DOMAIN-SUFFIX, browserleaks.org, PROXY
+DOMAIN-SUFFIX, browserleaks.io, PROXY
+DOMAIN-SUFFIX, ipleak.net, PROXY
+DOMAIN-SUFFIX, surfsharkdns.com, PROXY
+
+# ---------- IP / ASN / 出口环境检测 ----------
+DOMAIN-SUFFIX, whoer.net, PROXY
+DOMAIN-SUFFIX, pixelscan.net, PROXY
+DOMAIN-SUFFIX, ipapi.co, PROXY
+DOMAIN-SUFFIX, ipinfo.io, PROXY
+DOMAIN-SUFFIX, ifconfig.co, PROXY
+DOMAIN-SUFFIX, ifconfig.me, PROXY
+DOMAIN-SUFFIX, ip.sb, PROXY
+DOMAIN-SUFFIX, whatismyipaddress.com, PROXY
+DOMAIN-SUFFIX, whatismyip.com, PROXY
+DOMAIN-SUFFIX, iphey.com, PROXY
+DOMAIN, ip-scan.adspower.net, PROXY
+
+# ---------- IPv4 / IPv6 暴露检测 ----------
+DOMAIN-SUFFIX, ping0.cc, PROXY
+DOMAIN-SUFFIX, test-ipv6.com, PROXY
+DOMAIN-SUFFIX, ipv6-test.com, PROXY
+
+# ---------- WebRTC / 浏览器网络隐私检测 ----------
+# BrowserLeaks / IPLeak 同时提供 WebRTC、IP 与 DNS 检测；
+# 这里只负责让检测站本身走代理。真正的 STUN 行为仍由 disable-stun 等主配置控制。
+DOMAIN-SUFFIX, perfect-privacy.com, PROXY

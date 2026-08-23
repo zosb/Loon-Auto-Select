@@ -3,7 +3,7 @@ Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 
 This repository contains a reorganized and extended Loon configuration based on the public Loon Auto template by iKeLee / ProxyResource.
 
-You may share and adapt the material for non-commercial purposes, provided that you:
+You may share and adapt the material in this repository for non-commercial purposes, provided that you:
 
 1. Give appropriate attribution;
 2. Indicate changes where applicable; and
@@ -26,3 +26,5 @@ https://github.com/luestr/ProxyResource
 
 Upstream license:
 https://github.com/luestr/ProxyResource/blob/main/LICENSE
+
+Third-party rules, plugins, scripts, icons, Geo data, parsers and other resources referenced by URL are not relicensed by this repository. They remain subject to the licenses, notices and usage terms of their respective upstream authors and providers.

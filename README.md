@@ -12,13 +12,23 @@ Raw 配置地址：
 
 `https://raw.githubusercontent.com/zosb/Loon-Auto-Select/main/Loon_Auto_Select.lcf`
 
+## 快捷操作
+
+- [**开启 Loon**](https://www.nsloon.com/openloon/on)
+- [**更新全部订阅资源**](https://www.nsloon.com/openloon/update?sub=all)
+
+> 以上使用 Loon 官方 Universal Link。部分 GitHub / Raw GitHub 资源在某些网络环境下直连可能不稳定，可以先开启 Loon，再执行“更新全部订阅资源”。
+
 ## 主要特性
 
 - 中国大陆流量自动 `DIRECT`
 - 香港、澳门、台湾、日本、韩国、新加坡、美国、英国、德国节点自动筛选
 - **节点只按国家 / 地区归类**，不再按高倍率、实验、测试、游戏、YouTube、无广等标签拆分节点池
+- 地区筛选兼容常见中文 / 繁体 / 英文 / 国家代码 / 旗帜，以及 `HK-01`、`HK_01`、`US-02` 等常见命名
 - 国家 / 地区内部通过 `url-test` 自动选择较快节点
+- 地区内部测速周期为 120 秒，跨地区测速周期为 300 秒；`fallback` 保持 60 秒故障检测，减少不必要的后台测速和电量开销
 - IPv6 优先：`ip-mode = ipv6-preferred`，并使用 `ipv6-vif = always`
+- IPv4 / IPv6 本地与局域网地址显式绕过代理 / TUN，包含 `::1/128`、`fc00::/7`、`fe80::/10`、`ff00::/8`
 - AI 固定新加坡，并使用 `fallback` 尽量保持稳定出口 IP
 - TikTok 固定韩国，韩国内部自动优选
 - 国际流媒体固定美国，美国内部自动优选
@@ -53,11 +63,39 @@ Raw 配置地址：
 
 本配置不绑定任何机场品牌。
 
-区域节点通过节点名称进行筛选，例如香港、日本、新加坡、美国等常见中文名、英文名、国家代码及旗帜 Emoji。节点名称中的 `2X`、`实验`、`GAME`、`YouTube`、`无广` 等附加标签不会把它们排除出所属地区节点池。
+区域节点通过节点名称进行筛选，例如香港、日本、新加坡、美国等常见中文名、英文名、国家代码及旗帜 Emoji。当前筛选同时兼容常见空格、连字符和下划线命名，例如 `Hong Kong`、`HongKong`、`HK-01`、`HK_01`、`South Korea`、`United_States`、`USA-02` 等。
+
+节点名称中的 `2X`、`实验`、`GAME`、`YouTube`、`无广` 等附加标签不会把它们排除出所属地区节点池。
 
 如果某个机场使用非常特殊的节点命名方式，只需要调整 `[Remote Filter]` 中对应地区的 `NameRegex`，无需修改整套分流架构。
 
 配置中包含的特定节点域名 DNS 插件只处理其对应域名，不会接管全局 DNS，也不会限制其它机场使用。
+
+## IPv6 与本地网络
+
+当前配置优先使用 IPv6，并始终开启 IPv6 VIF：
+
+```ini
+ip-mode = ipv6-preferred
+ipv6-vif = always
+```
+
+同时对 IPv4 / IPv6 本地地址做绕过处理，避免局域网、回环、Link-Local、ULA 与 IPv6 Multicast 流量被无意义送入代理链路。主要 IPv6 范围包括：
+
+- `::1/128`：IPv6 回环
+- `fc00::/7`：IPv6 ULA 私有地址
+- `fe80::/10`：IPv6 Link-Local
+- `ff00::/8`：IPv6 Multicast（用于 TUN 绕过）
+
+## 测速与故障检测
+
+为了在自动选路和后台开销之间取得更好的平衡，当前使用分层周期：
+
+- 地区内部 `url-test`：`interval = 120`
+- 近邻 / 全球 / YouTube / 游戏上层 `url-test`：`interval = 300`
+- `fallback` 故障检测：继续保持 `interval = 60`
+
+`tolerance` 仍用于减少轻微延迟变化造成的频繁切换；游戏策略使用更高的 `tolerance = 80`。
 
 ## 策略说明
 

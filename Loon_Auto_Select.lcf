@@ -268,8 +268,10 @@ https://raw.githubusercontent.com/crushcloud91/Crush-Cloud/main/crushcloud-dns.p
 # ============================================================
 # 国外常用 App 专项去广告
 #
-# 仅保留常用且有明确专项插件的服务，避免为大量国内 App 增加 Rewrite / Script 面积。
-# 专项插件可能需要 MitM；App 更新后也可能需要更新插件。
+# 默认仅预装少量常用国外 App，避免把整个插件库全部塞进公共配置。
+# 如需 X、Instagram、Facebook、TikTok 或其它国内 / 国外 App 去广告，
+# 请前往可莉插件中心按需自行添加：https://hub.kelee.one
+# 建议只启用实际需要的插件，以减少 Rewrite / Script / MitM 覆盖范围和维护成本。
 # ============================================================
 
 https://kelee.one/Tool/Loon/Lpx/YouTube_remove_ads.lpx, enabled=true
@@ -279,6 +281,7 @@ https://kelee.one/Tool/Loon/Lpx/Pinterest_remove_ads.lpx, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Line_remove_ads.lpx, enabled=true
 
 # Spotify 插件仅用于广告处理，不等同于 Premium 解锁。
+# 专项插件可能依赖 MitM，并可能随 App 更新需要同步更新。
 
 # ============================================================
 # 工具插件

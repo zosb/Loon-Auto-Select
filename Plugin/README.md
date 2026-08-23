@@ -10,7 +10,7 @@
 Prevent_DNS_Leaks.lpx
 ```
 
-## Prevent_DNS_Leaks Enhanced v2.0.0
+## Prevent_DNS_Leaks Enhanced
 
 准确定位：
 

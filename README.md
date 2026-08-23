@@ -270,7 +270,7 @@ ipv6-vif = off
 进入：
 
 ```text
-Loon → 配置 → IP Stack
+Loon → 配置 → 高级配置 → IP Stack
 ```
 
 根据自己的网络环境选择：

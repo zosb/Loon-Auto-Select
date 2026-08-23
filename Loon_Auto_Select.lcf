@@ -10,6 +10,7 @@
 # 公开版原则：
 # - 不包含私人节点订阅 URL / Token
 # - 不包含 MitM CA / 证书密码
+# - 不绑定任何机场专属 DNS / Host 插件
 # - 默认仅启用 IPv4，IPv6 由用户按需在 Loon 中手动开启
 # ============================================================
 
@@ -116,17 +117,22 @@ bypass-tun = 10.0.0.0/8,100.64.0.0/10,127.0.0.0/8,169.254.0.0/16,172.16.0.0/12,1
 # 上层 url-test 每 300 秒重新评估；fallback 每 60 秒检测可用性。
 # ============================================================
 
+# 近邻池：港澳台日韩新。
 近邻时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,interval = 300,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png
-全球时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,美国时延优选,英国时延优选,德国时延优选,interval = 300,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Global.png
-近邻故障转移 = fallback,近邻时延优选,全球时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png
 
-# YouTube：地区内测速 → 常用地区间测速 → 全球故障转移。
+# 主要地区池：港澳台日韩新 + 美英德。它不是“全部全球节点”，避免无意义扩大后台测速范围。
+主要地区时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,美国时延优选,英国时延优选,德国时延优选,interval = 300,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Global.png
+
+# 近邻业务只有在整个近邻池不可用时，才扩大到主要地区池。
+近邻故障转移 = fallback,近邻时延优选,主要地区时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png
+
+# YouTube：地区内测速 → 常用地区间测速 → 主要地区故障转移。
 YouTube时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,美国时延优选,interval = 300,tolerance = 50,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YouTube.png
-YouTube故障转移 = fallback,YouTube时延优选,全球时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YouTube.png
+YouTube故障转移 = fallback,YouTube时延优选,主要地区时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YouTube.png
 
 # 游戏：覆盖港澳台日韩新美，并提高 tolerance 以减少游戏过程中的频繁切换。
 游戏时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,美国时延优选,interval = 300,tolerance = 80,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png
-游戏故障转移 = fallback,游戏时延优选,全球时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png
+游戏故障转移 = fallback,游戏时延优选,主要地区时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png
 
 # ============================================================
 # AI 稳定出口
@@ -212,6 +218,7 @@ https://rule.kelee.one/Loon/Whatsapp.lsr, policy=社交媒体, tag=WhatsApp, ena
 https://rule.kelee.one/Loon/Reddit.lsr, policy=社交媒体, tag=Reddit, enabled=true
 https://rule.kelee.one/Loon/Discord.lsr, policy=社交媒体, tag=Discord, enabled=true
 https://rule.kelee.one/Loon/Line.lsr, policy=社交媒体, tag=LINE, enabled=true
+https://rule.kelee.one/Loon/Pinterest.lsr, policy=社交媒体, tag=Pinterest, enabled=true
 
 # 国际流媒体：固定美国，美国内部自动测速。
 https://rule.kelee.one/Loon/Netflix.lsr, policy=国际流媒体, tag=Netflix, enabled=true
@@ -240,8 +247,8 @@ https://rule.kelee.one/Loon/Xbox.lsr, policy=游戏平台, tag=Xbox, enabled=tru
 # Google 必须位于 Gemini / AI / YouTube 之后。
 https://rule.kelee.one/Loon/Google.lsr, policy=Google, tag=Google, enabled=true
 
-# Speedtest
-https://kelee.one/Tool/Loon/Lsr/SpeedtestInternational.lsr, policy=全球时延优选, tag=Speedtest-Intl, enabled=true
+# Speedtest 使用自动主要地区池。
+https://kelee.one/Tool/Loon/Lsr/SpeedtestInternational.lsr, policy=主要地区时延优选, tag=Speedtest-Intl, enabled=true
 
 # 中国大陆 REGION 保持远程规则最后。
 https://kelee.one/Tool/Loon/Lsr/REGION_SPLITTER.lsr, policy=DIRECT, tag=CN-REGION, enabled=true
@@ -261,9 +268,6 @@ https://kelee.one/Tool/Loon/Lsr/REGION_SPLITTER.lsr, policy=DIRECT, tag=CN-REGIO
 
 https://kelee.one/Tool/Loon/Lpx/BlockAdvertisers.lpx, pin=true, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Block_HTTPDNS.lpx, pin=true, enabled=true
-
-# 特定节点域名 DNS；仅匹配 *.node.daacc.org，不接管全局 DNS。
-https://raw.githubusercontent.com/crushcloud91/Crush-Cloud/main/crushcloud-dns.plugin, img-url=externaldrive.badge.icloud, enabled=true
 
 # ============================================================
 # 国外常用 App 专项去广告

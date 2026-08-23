@@ -95,15 +95,25 @@ bypass-tun = 10.0.0.0/8,100.64.0.0/10,127.0.0.0/8,169.254.0.0/16,172.16.0.0/12,1
 德国时延优选 = url-test,德国节点,interval = 60,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Germany.png
 
 # ============================================================
-# 共享上层测速
+# 共享上层测速 / 故障转移
 # ============================================================
 
-# 近邻池加入韩国，为 Google / 社交 / 开发等业务提供更多低延迟候选地区。
+# 近邻池：港澳台日韩新；正常优先低延迟地区。
 近邻时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,interval = 180,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png
+
+# 全球池：近邻地区 + 美英德。
 全球时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,美国时延优选,英国时延优选,德国时延优选,interval = 180,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Global.png
 
-# YouTube 使用两层 url-test：先在各地区内部选快节点，再在地区之间选快策略。
+# 近邻业务只有在整个近邻池不可用时，才自动扩大到全球池。
+近邻故障转移 = fallback,近邻时延优选,全球时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png
+
+# YouTube：地区内先测速，地区间再测速；常用地区全部不可用时才进入全球池。
 YouTube时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,美国时延优选,interval = 180,tolerance = 50,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YouTube.png
+YouTube故障转移 = fallback,YouTube时延优选,全球时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YouTube.png
+
+# 游戏：加入澳门；使用更高 tolerance 减少轻微延迟波动造成的频繁切换。
+游戏时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,美国时延优选,interval = 180,tolerance = 80,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png
+游戏故障转移 = fallback,游戏时延优选,全球时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png
 
 # ============================================================
 # AI
@@ -114,26 +124,36 @@ AI新加坡稳定 = fallback,新国节点,interval = 60,max-timeout = 2000,img-u
 
 # ============================================================
 # 应用策略
+# 第一项始终是自动策略；后续手动策略仅用于需要时临时接管。
 # ============================================================
 
-Telegram = fallback,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,新加坡时延优选,美国时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Telegram.png
-YouTube = select,YouTube时延优选,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YouTube.png
+# Telegram 自动容灾链扩展到韩国 / 英国 / 德国；默认仍保持香港优先。
+Telegram自动 = fallback,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,新加坡时延优选,韩国时延优选,美国时延优选,英国时延优选,德国时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Telegram.png
+Telegram = select,Telegram自动,香港手动策略,澳门手动策略,台湾手动策略,日本手动策略,新加坡手动策略,韩国手动策略,美国手动策略,英国手动策略,德国手动策略,全球手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Telegram.png
 
-ChatGPT = select,AI新加坡稳定,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/ChatGPT.png
-Gemini = select,AI新加坡稳定,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/GoogleGemini.png
-Claude = select,AI新加坡稳定,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Claude.png
-Copilot = select,AI新加坡稳定,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/MicrosoftCopilot.png
-Grok = select,AI新加坡稳定,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Grok.png
+YouTube = select,YouTube故障转移,香港手动策略,澳门手动策略,台湾手动策略,日本手动策略,韩国手动策略,新加坡手动策略,美国手动策略,英国手动策略,德国手动策略,全球手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YouTube.png
 
-Google = select,近邻时延优选,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Google.png
-TikTok = select,韩国时延优选,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/TikTok.png
-社交媒体 = select,近邻时延优选,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/X.png
-国际流媒体 = select,美国时延优选,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Netflix.png
-Spotify = select,美国时延优选,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Spotify.png
-开发服务 = select,近邻时延优选,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/GitHub.png
+# AI 保持固定新加坡；手动接管也只允许选择新加坡节点。
+ChatGPT = select,AI新加坡稳定,新加坡手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/ChatGPT.png
+Gemini = select,AI新加坡稳定,新加坡手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/GoogleGemini.png
+Claude = select,AI新加坡稳定,新加坡手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Claude.png
+Copilot = select,AI新加坡稳定,新加坡手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/MicrosoftCopilot.png
+Grok = select,AI新加坡稳定,新加坡手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Grok.png
 
-# 游戏平台按延迟自动选地区；更高 tolerance 减少轻微延迟波动导致的切换。
-游戏平台 = url-test,香港时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,美国时延优选,interval = 180,tolerance = 80,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png
+Google = select,近邻故障转移,香港手动策略,澳门手动策略,台湾手动策略,日本手动策略,韩国手动策略,新加坡手动策略,美国手动策略,英国手动策略,德国手动策略,全球手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Google.png
+
+# TikTok 保持韩国；手动接管也只在韩国节点池内选择。
+TikTok = select,韩国时延优选,韩国手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/TikTok.png
+
+社交媒体 = select,近邻故障转移,香港手动策略,澳门手动策略,台湾手动策略,日本手动策略,韩国手动策略,新加坡手动策略,美国手动策略,英国手动策略,德国手动策略,全球手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/X.png
+
+# 国际流媒体和 Spotify 仍固定美国；保留美国手动节点接管，不自动跨区改变媒体库。
+国际流媒体 = select,美国时延优选,美国手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Netflix.png
+Spotify = select,美国时延优选,美国手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Spotify.png
+
+开发服务 = select,近邻故障转移,香港手动策略,澳门手动策略,台湾手动策略,日本手动策略,韩国手动策略,新加坡手动策略,美国手动策略,英国手动策略,德国手动策略,全球手动策略,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/GitHub.png
+
+游戏平台 = select,游戏故障转移,香港手动策略,澳门手动策略,台湾手动策略,日本手动策略,韩国手动策略,新加坡手动策略,美国手动策略,英国手动策略,德国手动策略,全球手动策略,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png
 
 # ============================================================
 # FINAL

@@ -1,4 +1,6 @@
-# Private Loon / proxy credentials
+# ============================================================
+# Private credentials / certificates
+# ============================================================
 *.p12
 *.pfx
 *.pem
@@ -7,7 +9,9 @@
 *.crt
 *.mobileconfig
 
-# Local/private configuration variants
+# ============================================================
+# Private / local Loon configuration
+# ============================================================
 *.private.lcf
 *.local.lcf
 Loon_Auto_Select_Private.lcf
@@ -15,14 +19,23 @@ secrets.*
 .env
 .env.*
 
-# OS / editor files
+# ============================================================
+# OS / editor metadata
+# ============================================================
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+.history/
 
-# Temporary / backup files
+# ============================================================
+# Temporary / backup / log files
+# ============================================================
 *.bak
 *.tmp
 *.swp
+*.swo
+*.orig
+*.rej
+*.log
 *~

@@ -98,8 +98,12 @@ bypass-tun = 10.0.0.0/8,100.64.0.0/10,127.0.0.0/8,169.254.0.0/16,172.16.0.0/12,1
 # 共享上层测速
 # ============================================================
 
-近邻时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,新加坡时延优选,interval = 180,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png
+# 近邻池加入韩国，为 Google / 社交 / 开发等业务提供更多低延迟候选地区。
+近邻时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,interval = 180,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Auto.png
 全球时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,美国时延优选,英国时延优选,德国时延优选,interval = 180,tolerance = 50,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Global.png
+
+# YouTube 使用两层 url-test：先在各地区内部选快节点，再在地区之间选快策略。
+YouTube时延优选 = url-test,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,美国时延优选,interval = 180,tolerance = 50,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YouTube.png
 
 # ============================================================
 # AI
@@ -113,7 +117,7 @@ AI新加坡稳定 = fallback,新国节点,interval = 60,max-timeout = 2000,img-u
 # ============================================================
 
 Telegram = fallback,香港时延优选,澳门时延优选,台湾时延优选,日本时延优选,新加坡时延优选,美国时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Telegram.png
-YouTube = fallback,澳门时延优选,香港时延优选,台湾时延优选,日本时延优选,新加坡时延优选,美国时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YouTube.png
+YouTube = select,YouTube时延优选,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/YouTube.png
 
 ChatGPT = select,AI新加坡稳定,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/ChatGPT.png
 Gemini = select,AI新加坡稳定,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/GoogleGemini.png
@@ -127,7 +131,9 @@ TikTok = select,韩国时延优选,img-url = https://raw.githubusercontent.com/l
 国际流媒体 = select,美国时延优选,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Netflix.png
 Spotify = select,美国时延优选,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/Spotify.png
 开发服务 = select,近邻时延优选,img-url = https://raw.githubusercontent.com/luestr/IconResource/main/App_icon/120px/GitHub.png
-游戏平台 = fallback,香港时延优选,日本时延优选,新加坡时延优选,美国时延优选,interval = 60,max-timeout = 2000,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png
+
+# 游戏平台按延迟自动选地区；更高 tolerance 减少轻微延迟波动导致的切换。
+游戏平台 = url-test,香港时延优选,台湾时延优选,日本时延优选,韩国时延优选,新加坡时延优选,美国时延优选,interval = 180,tolerance = 80,img-url = https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/Game.png
 
 # ============================================================
 # FINAL
@@ -187,6 +193,9 @@ https://rule.kelee.one/Loon/Spotify.lsr, policy=Spotify, tag=Spotify, enabled=tr
 https://rule.kelee.one/Loon/GitHub.lsr, policy=开发服务, tag=GitHub, enabled=true
 https://rule.kelee.one/Loon/GitLab.lsr, policy=开发服务, tag=GitLab, enabled=true
 https://rule.kelee.one/Loon/Notion.lsr, policy=开发服务, tag=Notion, enabled=true
+https://rule.kelee.one/Loon/Docker.lsr, policy=开发服务, tag=Docker, enabled=true
+https://rule.kelee.one/Loon/Npmjs.lsr, policy=开发服务, tag=NPM, enabled=true
+https://rule.kelee.one/Loon/Vercel.lsr, policy=开发服务, tag=Vercel, enabled=true
 
 # 游戏
 https://rule.kelee.one/Loon/SteamCN.lsr, policy=DIRECT, tag=Steam-CN, enabled=true

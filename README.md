@@ -314,13 +314,15 @@ ff00::/8
 
 ## 去广告与插件
 
-这一版不再默认安装大量国内 App 专项去广告插件。
+默认配置不会把可莉插件库中的所有去广告插件全部预装进来。
 
-设计改为：
+这是有意做的取舍：**默认版只保留少量常用国外 App 的专项去广告插件，保证配置精简、Rewrite / Script 范围可控，也降低 App 更新后出现兼容问题的概率。**
+
+整体结构为：
 
 ```text
 广告平台基础拦截
-+ 国外常用 App 专项去广告
++ 少量国外常用 App 专项去广告
 + 必要工具插件
 ```
 
@@ -333,9 +335,9 @@ Block_HTTPDNS
 
 `BlockAdvertisers` 放在插件列表顶部，作为专项去广告插件的基础广告平台拦截层。
 
-### 国外常用 App 专项
+### 默认专项去广告 App
 
-默认保留：
+默认仅预装以下常用国外 App：
 
 ```text
 YouTube
@@ -355,7 +357,19 @@ Pinterest_remove_ads.lpx
 Line_remove_ads.lpx
 ```
 
-没有为 X、Instagram、Facebook、TikTok 等所有国外 App 强行堆叠专项插件。基础广告平台拦截仍会处理能够命中的广告网络请求，而专项插件只保留当前配置真正需要的少量常用服务，以减少 Rewrite / Script 面积和长期维护成本。
+这些是**默认内置项**，并不代表本配置只能给这些 App 添加去广告功能。
+
+### 需要其它 App 去广告怎么办？
+
+如果你还需要 X、Instagram、Facebook、TikTok，或者其它国内 / 国外 App 的专项去广告，可以直接前往 **可莉插件库** 自行选择并添加：
+
+**可莉插件中心：** https://hub.kelee.one
+
+建议只添加自己实际使用、确实有需求的插件，不建议一次性把插件库全部启用。专项插件越多，Rewrite / Script / MitM 的覆盖范围越大，长期维护和排查兼容问题也会更复杂。
+
+因此本项目默认采用的原则是：
+
+> **基础拦截默认开启；常用专项少量预装；其它 App 按需从可莉插件库自行添加。**
 
 ### YouTube
 
@@ -483,6 +497,12 @@ LAN
 
 专项插件比基础分流规则更容易受客户端版本变化影响，所以不建议为了一个 App 的 Rewrite 问题去修改整个策略架构。
 
+### 想给其它 App 添加去广告
+
+默认版只预装 YouTube、Spotify、Reddit、Pinterest、LINE 等少量常用专项插件。
+
+其它 App 请前往 **https://hub.kelee.one** 按需选择插件并自行添加，不建议把所有插件一次性启用。
+
 ### IPv6 节点无法连接
 
 公开默认版 IPv6 是关闭的。
@@ -517,6 +537,7 @@ ca-passphrase
 - ShuntRules: https://github.com/luestr/ShuntRules
 - IconResource: https://github.com/luestr/IconResource
 - Qure Icons: https://github.com/Koolson/Qure
+- 可莉插件中心: https://hub.kelee.one
 
 原始模板作者：**iKeLee** — https://t.me/iKeLee
 

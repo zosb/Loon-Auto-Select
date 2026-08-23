@@ -15,8 +15,8 @@
 
 [General]
 
-ip-mode = dual
-ipv6-vif = auto
+ip-mode = ipv6-preferred
+ipv6-vif = always
 dns-server = system
 sni-sniffing = true
 disable-stun = true

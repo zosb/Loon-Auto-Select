@@ -266,10 +266,12 @@ https://kelee.one/Tool/Loon/Lsr/REGION_SPLITTER.lsr, policy=DIRECT, tag=CN-REGIO
 # 基础网络 / 广告层
 # BlockAdvertisers 是专项去广告插件的基础，保持在插件列表顶部。
 # Block_HTTPDNS 用于拦截常见 App 自带 HTTPDNS，使相关请求回到 Loon 的 DNS 框架。
+# Prevent_DNS_Leaks Enhanced 仅负责泄漏检测站路由辅助，不替代真正的 DNS / TUN / STUN 配置。
 # ============================================================
 
 https://kelee.one/Tool/Loon/Lpx/BlockAdvertisers.lpx, pin=true, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Block_HTTPDNS.lpx, pin=true, enabled=true
+https://raw.githubusercontent.com/zosb/Loon-Auto-Select/main/Plugin/Prevent_DNS_Leaks.lpx, policy=兜底后备策略, enabled=true
 
 # ============================================================
 # 国外常用 App 专项去广告

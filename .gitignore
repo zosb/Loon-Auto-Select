@@ -12,9 +12,10 @@
 # ============================================================
 # Private / local Loon configuration
 # ============================================================
-*.private.lcf
-*.local.lcf
-Loon_Auto_Select_Private.lcf
+# Ignore every Loon config by default, then explicitly allow the public main file.
+*.lcf
+!Loon_Auto_Select.lcf
+
 secrets.*
 .env
 .env.*

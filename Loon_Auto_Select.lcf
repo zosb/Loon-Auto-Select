@@ -77,8 +77,9 @@ bypass-tun = 10.0.0.0/8,100.64.0.0/10,127.0.0.0/8,169.254.0.0/16,172.16.0.0/12,1
 英国节点 = NameRegex, FilterKey = "^(?=.*((?i)🇬🇧|英国|英國|伦敦|倫敦|曼彻斯特|曼徹斯特|伯明翰|London|Manchester|Birmingham|Britain|England|United[\s_-]*Kingdom|(\b(GBR|GB|UK)(?:[\s_-]*\d+)?(?![A-Za-z])))).*$"
 德国节点 = NameRegex, FilterKey = "^(?=.*((?i)🇩🇪|德国|德國|法兰克福|法蘭克福|柏林|慕尼黑|Frankfurt|Berlin|Munich|Germany|(\b(DEU|GER|DE)(?:[\s_-]*\d+)?(?![A-Za-z])))).*$"
 
-# 全球节点仅过滤常见订阅信息项，不区分倍率、实验或用途标签。
-全球节点 = NameRegex, FilterKey = "^(?=.*(.))(?!.*((?i)群|邀请|邀請|返利|循环|循環|官网|官網|客服|网站|網站|网址|網址|获取|獲取|订阅|訂閱|流量|到期|机场|機場|下次|版本|官址|备用|備用|过期|過期|已用|联系|聯繫|邮箱|郵箱|工单|工單|贩卖|販賣|通知|倒卖|倒賣|防止|国内|國內|地址|频道|頻道|无法|無法|说明|說明|使用|提示|特别|特別|访问|訪問|支持|教程|关注|關注|更新|作者|加入|超时|超時|收藏|福利|好友|失联|失聯|(\b(USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic)(\d+)?\b|(\d{4}-\d{2}-\d{2}|\dG)))).*$"
+# 全球节点只过滤明确的订阅信息 / 公告项。
+# 不再用“备用、支持、特别、访问、使用”等泛化词过滤，避免误伤真实节点名称。
+全球节点 = NameRegex, FilterKey = "^(?=.*(.))(?!.*((?i)群|邀请|邀請|返利|循环|循環|官网|官網|客服|网站|網站|网址|網址|获取|獲取|订阅|訂閱|流量|剩余|剩餘|到期|有效期|过期|過期|机场|機場|下次|重置|套餐|版本|已用|联系|聯繫|邮箱|郵箱|工单|工單|通知|频道|頻道|更新|作者|失联|失聯|(\b(USE|USED|TOTAL|EXPIRE|EMAIL|Panel|Channel|Author|Traffic)(\d+)?\b|(\d{4}-\d{2}-\d{2}|\dG)))).*$"
 
 [Proxy Group]
 
@@ -264,6 +265,7 @@ https://kelee.one/Tool/Loon/Lsr/REGION_SPLITTER.lsr, policy=DIRECT, tag=CN-REGIO
 # ============================================================
 # 基础网络 / 广告层
 # BlockAdvertisers 是专项去广告插件的基础，保持在插件列表顶部。
+# Block_HTTPDNS 用于拦截常见 App 自带 HTTPDNS，使相关请求回到 Loon 的 DNS 框架。
 # ============================================================
 
 https://kelee.one/Tool/Loon/Lpx/BlockAdvertisers.lpx, pin=true, enabled=true
@@ -276,6 +278,9 @@ https://kelee.one/Tool/Loon/Lpx/Block_HTTPDNS.lpx, pin=true, enabled=true
 # 如需 X、Instagram、Facebook、TikTok 或其它国内 / 国外 App 去广告，
 # 请前往可莉插件中心按需自行添加：https://hub.kelee.one
 # 建议只启用实际需要的插件，以减少 Rewrite / Script / MitM 覆盖范围和维护成本。
+#
+# 建议使用 Loon 3.4.0 (962) 或更高版本，并保持插件资源为最新。
+# YouTube 专项插件需要本地启用 MitM over HTTP/2 与 QUIC 回退保护。
 # ============================================================
 
 https://kelee.one/Tool/Loon/Lpx/YouTube_remove_ads.lpx, enabled=true
@@ -284,7 +289,7 @@ https://kelee.one/Tool/Loon/Lpx/Reddit_remove_ads.lpx, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Pinterest_remove_ads.lpx, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Line_remove_ads.lpx, enabled=true
 
-# Spotify 插件仅用于广告处理，不等同于 Premium 解锁。
+# Spotify 插件仅用于广告处理，不等同于 Premium 解锁；修改插件自定义选项后可能需要重新登录。
 # 专项插件可能依赖 MitM，并可能随 App 更新需要同步更新。
 
 # ============================================================
@@ -292,7 +297,6 @@ https://kelee.one/Tool/Loon/Lpx/Line_remove_ads.lpx, enabled=true
 # ============================================================
 
 https://kelee.one/Tool/Loon/Lpx/QuickSearch.lpx, enabled=true
-https://kelee.one/Tool/Loon/Lpx/Prevent_DNS_Leaks.lpx, policy=兜底后备策略, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Node_detection_tool.lpx, enabled=true
 https://kelee.one/Tool/Loon/Lpx/BoxJs.lpx, policy=兜底后备策略, enabled=true
 https://kelee.one/Tool/Loon/Lpx/Sub-Store.lpx, policy=兜底后备策略, enabled=true

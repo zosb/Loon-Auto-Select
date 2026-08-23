@@ -6,7 +6,7 @@
 
 [**点击这里直接添加到 Loon**](https://www.nsloon.com/openloon/import?sub=https%3A%2F%2Fraw.githubusercontent.com%2Fzosb%2FLoon-Auto-Select%2Fmain%2FLoon_Auto_Select.lcf)
 
-> 该按钮使用 Loon 官方远程配置导入 URL Scheme。点击后会打开 Loon 并导入本仓库的 `Loon_Auto_Select.lcf`。配置本身不包含任何私人机场订阅，请在导入后自行添加自己的节点订阅。
+> 点击后会打开 Loon 并导入本仓库的 `Loon_Auto_Select.lcf`。公开配置不包含任何私人机场订阅，请在导入后自行添加自己的节点订阅。
 
 Raw 配置地址：
 
@@ -16,13 +16,12 @@ Raw 配置地址：
 
 - 中国大陆流量自动 `DIRECT`
 - 香港、澳门、台湾、日本、韩国、新加坡、美国、英国、德国节点自动筛选
+- **节点只按国家 / 地区归类**，不再按高倍率、实验、测试、游戏、YouTube、无广等标签拆分节点池
 - 国家 / 地区内部通过 `url-test` 自动选择较快节点
 - AI 固定新加坡，并使用 `fallback` 尽量保持稳定出口 IP
 - TikTok 固定韩国，韩国内部自动优选
 - 国际流媒体固定美国，美国内部自动优选
-- YouTube 专用 / 无广节点优先
-- 游戏、实验、YouTube 专线、高倍率节点与普通流量池隔离
-- 支持机场自定义 DNS；当前配置额外包含 Crush Cloud 节点域名的专用 DNS 插件，该插件不会限制其它机场使用
+- YouTube 按地区策略自动容灾
 - HTTPDNS 防绕过与 DNS 防泄漏
 - 通用广告拦截 + 常用 App 专项去广告插件
 - 国家 / 地区图标使用 Qure，应用图标使用 IconResource
@@ -39,20 +38,20 @@ Raw 配置地址：
 
 1. 下载或复制 `Loon_Auto_Select.lcf`。
 2. 在 `[Remote Proxy]` 中填入你自己的机场订阅，或直接在 Loon 中添加节点订阅。
-3. 导入 Loon 后更新远程规则、插件和节点资源。
+3. 开启 Loon 后更新远程规则、插件和节点资源；部分 GitHub / Raw GitHub 资源在某些网络环境下直连可能不稳定。
 4. 如需使用依赖 HTTPS Rewrite / Script 的专项去广告插件，请在 Loon 本地生成、安装并信任你自己的 MitM CA。
 
 > **安全提示：** 本仓库不会包含任何私人机场订阅 URL、Token、MitM CA、证书密码或其它凭据。请勿将这些内容提交到公开仓库。
 
 ## 机场兼容性
 
-本配置**不绑定 Crush Cloud，也不限定任何机场品牌**。
+本配置不绑定任何机场品牌。
 
-区域节点通过节点名称进行筛选，例如香港、日本、新加坡、美国等常见中文名、英文名、国家代码及旗帜 Emoji。绝大多数采用常见命名方式的机场订阅都可以直接使用。
+区域节点通过节点名称进行筛选，例如香港、日本、新加坡、美国等常见中文名、英文名、国家代码及旗帜 Emoji。节点名称中的 `2X`、`实验`、`GAME`、`YouTube`、`无广` 等附加标签不会把它们排除出所属地区节点池。
 
 如果某个机场使用非常特殊的节点命名方式，只需要调整 `[Remote Filter]` 中对应地区的 `NameRegex`，无需修改整套分流架构。
 
-Crush Cloud DNS 插件只针对其特定节点域名提供解析，不会接管全局 DNS，也不会影响其它机场节点正常使用。
+配置中包含的特定节点域名 DNS 插件只处理其对应域名，不会接管全局 DNS，也不会限制其它机场使用。
 
 ## 策略说明
 
@@ -70,7 +69,11 @@ Netflix、Disney+、Amazon Prime Video、Twitch、Apple TV+ 以及 `USMedia` 规
 
 ### YouTube
 
-优先使用节点名称中含 `YouTube` / `油管` 的专用节点；专用节点池不可用时再按地区策略自动容灾。
+按澳门 → 香港 → 台湾 → 日本 → 新加坡 → 美国的地区顺序自动容灾；每个地区内部通过 `url-test` 自动优选节点。
+
+### 游戏
+
+Steam、Epic、PlayStation、Xbox 等游戏平台不再依赖“游戏节点”命名，按香港 → 日本 → 新加坡 → 美国的地区顺序自动容灾。
 
 ## 上游与致谢
 
